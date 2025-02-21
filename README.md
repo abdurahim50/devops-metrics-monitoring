@@ -71,7 +71,7 @@ Ensure you have the following installed:
 git clone https://github.com/your-username/devops-monitoring.git
 cd devops-monitoring
 ```
-### **3️⃣ Create .env File
+### 3️⃣ Create .env File
 ```
 # Database
 POSTGRE_HOST=db
@@ -86,7 +86,7 @@ ALGORITHM=HS256
 ```
 
 ## 🚀 Phase 2: Backend Development (FastAPI)
-### **4️⃣ Install Dependencies
+### 4️⃣ Install Dependencies
 ```
 pip install -r requirements.txt
 
