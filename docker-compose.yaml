@@ -2,7 +2,10 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:14
+    image: postgres:15
+    volumes:
+     # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    - postgres_data:/var/lib/postgresql/data
     env_file: .env
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -22,7 +25,9 @@ services:
       - zookeeper
 
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: docker/Dockerfile  # Corrected path to Dockerfile
     env_file: .env
     ports:
       - "8000:8000"
@@ -31,7 +36,12 @@ services:
         condition: service_healthy
       kafka:
         condition: service_started
+    volumes:
+      - .:/app  # Mounts the project directory to the container
 
 networks:
   default:
     name: monitoring-network
+  
+volumes:
+  postgres_data:  # ✅ Added volume definition

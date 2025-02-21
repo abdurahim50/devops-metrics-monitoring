@@ -1,4 +1,5 @@
 # app/producer.py
+# from kafka import KafkaProducer  # Replace confluent_kafka with kafka
 from confluent_kafka import Producer
 import json
 import psutil
@@ -15,5 +16,8 @@ def produce_metrics():
             "memory": psutil.virtual_memory().percent,
             "timestamp": time.time()
         }
-        producer.produce("metrics", json.dumps(data))
+        producer.produce("metrics_topic", json.dumps(data))
         time.sleep(5)
+
+if __name__ == "__main__":
+    produce_metrics()

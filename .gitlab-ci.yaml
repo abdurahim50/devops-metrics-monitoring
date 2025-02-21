@@ -1,0 +1,27 @@
+# .gitlab-ci.yml
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  DOCKER_IMAGE: registry.gitlab.com/your-username/metrics-app
+
+test:
+  stage: test
+  script:
+    - pip install -r requirements.txt
+    - pytest -v
+
+build:
+  stage: build
+  script:
+    - docker build -t $DOCKER_IMAGE .
+    - docker push $DOCKER_IMAGE
+
+deploy:
+  stage: deploy
+  script:
+    - terraform init
+    - terraform apply -auto-approve
+    - helm upgrade --install metrics-app ./helm
