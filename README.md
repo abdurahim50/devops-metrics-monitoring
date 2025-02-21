@@ -56,14 +56,12 @@ This project is a **real-time system monitoring application** that collects, pro
 ```
 
 ---
-
+## 🚀 Phase 1: Project Setup
 ## 🛠️ Setup & Installation
 
 ### **1️⃣ Prerequisites**
 Ensure you have the following installed:
-- [Python 3.9+](https://www.python.org/downloads/)
-- [PostgreSQL](https://www.postgresql.org/)
-- [Apache Kafka](https://kafka.apache.org/)
+- [Python 3.10+](https://www.python.org/downloads/)
 - [Docker](https://www.docker.com/)
 - [Kubernetes (kubectl, minikube)](https://kubernetes.io/)
 - [Terraform](https://www.terraform.io/)
@@ -73,10 +71,55 @@ Ensure you have the following installed:
 git clone https://github.com/your-username/devops-monitoring.git
 cd devops-monitoring
 ```
+### **3️⃣ Create .env File
+```
+# Database
+POSTGRE_HOST=db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=StrongPass123!
+POSTGRES_DB=metrics_db
+# Kafka
+KAFKA_BROKER=kafka:9092
+# security
+SECRET_KEY=$(openssl rand -hex 32)  # Generate a secure key
+ALGORITHM=HS256
+```
+
+## 🚀 Phase 2: Backend Development (FastAPI)
+### **4️⃣ Install Dependencies
+```
+pip install -r requirements.txt
+
+# output
+annotated-types==0.7.0
+anyio==4.8.0
+click==8.1.8
+fastapi==0.115.8
+greenlet==3.1.1
+h11==0.14.0
+idna==3.10
+#kafka-python==2.0.3
+prometheus_client==0.21.1
+psycopg2-binary==2.9.10
+pydantic==2.10.6
+pydantic_core==2.27.2
+sniffio==1.3.1
+SQLAlchemy==2.0.38
+starlette==0.45.3
+typing_extensions==4.12.2
+uvicorn==0.34.0
+python-jose[cryptography]==3.3.0
+passlib==1.7.4
+python-multipart==0.0.6
+cryptography==42.0.8  # Required for JWT
+psutil==5.9.8
+confluent-kafka==2.3.0
+```
+
 
 ### **3️⃣ Set Up FastAPI Backend**
 ```bash
-cd backend
+cd devops-monitoring
 pip install -r requirements.txt
 python main.py
 ```
