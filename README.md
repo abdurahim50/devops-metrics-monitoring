@@ -19,21 +19,40 @@ This project is a **real-time system monitoring application** that collects, pro
 ## 📂 Project Structure
 ```
 📦 devops-monitoring
-├── 📂 backend           # FastAPI app for collecting system metrics
-│   ├── main.py         # API endpoints for metrics
-│   ├── database.py     # PostgreSQL database connection
-│   ├── producer.py     # Kafka producer for real-time streaming
-│   ├── consumer.py     # Kafka consumer to process messages
-│   ├── Dockerfile      # Dockerfile for containerizing the app
-│   ├── requirements.txt # Dependencies
-├── 📂 kubernetes        # Kubernetes deployment files
-│   ├── deployment.yaml # Kubernetes deployment spec
-│   ├── service.yaml    # Kubernetes service for app
-│   ├── monitoring.yaml # Grafana and VictoriaMetrics setup
-├── 📂 terraform         # Terraform scripts to deploy EKS cluster
-│   ├── main.tf         # Infrastructure setup
-├── .gitlab-ci.yml      # CI/CD pipeline configuration
-└── README.md           # Documentation
+├── 📂 app                 # FastAPI app for collecting system metrics
+│   ├── __init__.py       # Initializes the app module
+│   ├── __pycache__       # Compiled Python files
+│   │   ├── __init__.cpython-310.pyc
+│   │   ├── __init__.cpython-39.pyc
+│   │   ├── database.cpython-310.pyc
+│   │   ├── main.cpython-310.pyc
+│   │   └── main.cpython-39.pyc
+│   ├── consumer.py       # Kafka consumer to process messages
+│   ├── database.py       # PostgreSQL database connection
+│   ├── main.py           # API endpoints for metrics
+│   ├── producer.py       # Kafka producer for real-time streaming
+│   └── schemas.py        # Pydantic models for data validation
+├── 📂 docker              # Docker related files
+│   ├── Dockerfile        # Dockerfile for containerizing the app
+│   └── start.sh          # Startup script for the container
+├── docker-compose.yaml   # Docker Compose configuration for multi-container setup
+├── 📂 helm               # Helm charts for Kubernetes deployment
+│   └── metrics-app       # Helm chart for deploying the metrics app
+├── 📂 kubernetes         # Kubernetes deployment files
+│   ├── alerting_rules.yaml   # Alerting rules configuration
+│   ├── deployment.yaml   # Kubernetes deployment spec
+│   ├── hpa.yaml          # Horizontal Pod Autoscaler configuration
+│   ├── monitoring.yaml   # Grafana and VictoriaMetrics setup
+│   ├── network-policy.yaml   # Network policy configuration
+│   ├── pdb.yaml          # Pod Disruption Budget configuration
+│   └── service.yaml      # Kubernetes service for the app
+├── requirements.txt      # Dependencies for the Python app
+├── 📂 terraform          # Terraform scripts to deploy EKS cluster
+│   ├── eks_cluster.tf    # EKS cluster configuration
+│   └── main.tf           # Infrastructure setup
+└── 📂 tests              # Automated tests for the application
+    └── test_main.py      # Tests for API endpoints
+
 ```
 
 ---
