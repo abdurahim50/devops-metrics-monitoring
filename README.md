@@ -177,7 +177,7 @@ kubectl create secret generic app-secrets \
  
 ## 📊 Monitoring & Alerting
 This project integrates **Grafana & VictoriaMetrics** for real-time monitoring
-### Install VictoriaMetrics & Grafana
+#### Install VictoriaMetrics & Grafana
 ```
 helm repo add victoria-metrics https://victoriametrics.github.io/helm-charts
 helm install victoria-metrics victoria-metrics/victoria-metrics-single -n monitoring
