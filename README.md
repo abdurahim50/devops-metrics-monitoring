@@ -210,6 +210,7 @@ groups:
 ```
 
 
+---
 ## 🚀 CI/CD Pipeline (GitLab)
 
 This project uses **GitLab CI/CD** for automated builds and deployments. The `.gitlab-ci.yml` file contains:
