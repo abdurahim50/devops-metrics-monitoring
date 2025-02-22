@@ -89,6 +89,7 @@ SECRET_KEY=$(openssl rand -hex 32)  # Generate a secure key
 ALGORITHM=HS256
 ```
 
+---
 ## 🚀 Phase 2: Backend Development (FastAPI)
 ### 4️⃣ Install Dependencies
 ```
@@ -150,6 +151,7 @@ docker-compose exec app python app/consumer.py
 docker-compose exec db psql -U postgres -d metrics_db -c "SELECT * FROM metrics;"
 ```
 
+---
 ## 🚀 Phase 3: Production Deployment (AWS EKS)
 1. **Configure AWS CLI**
 ```
@@ -171,7 +173,8 @@ kubectl create secret generic app-secrets \
   --from-literal=SECRET_KEY=$(openssl rand -hex 32)
 ```
 
-   
+---
+ 
 ## 📊 Monitoring & Alerting
 This project integrates **Grafana & VictoriaMetrics** for real-time monitoring
 ### Install VictoriaMetrics & Grafana
@@ -193,6 +196,18 @@ Visit http://localhost:3000 and configure VictoriaMetrics as a data source.
   ```promql
   sum(rate(cpu_usage[5m])) by (instance)
   ```
+  
+###  **Set Up Alerting Rules**
+```yaml
+groups:
+- name: alerts
+  rules:
+  - alert: HighCPUUsage
+    expr: avg(rate(cpu_usage[5m])) > 75
+    for: 2m
+    labels:
+      severity: critical
+```
 
 
 ## 🚀 CI/CD Pipeline (GitLab)
@@ -229,43 +244,6 @@ Trigger the pipeline by pushing code to GitLab:
 git add .
 git commit -m "Deploying new version"
 git push origin main
-```
-
-
----
-
-## 📊 Monitoring & Alerting
-This project integrates **Grafana & VictoriaMetrics** for real-time monitoring.
-
-### **1️⃣ Install Grafana & VictoriaMetrics**
-```bash
-helm install vm victoria-metrics/victoria-metrics-single
-helm install grafana grafana/grafana
-```
-
-### **2️⃣ Access Grafana Dashboard**
-```bash
-kubectl port-forward svc/grafana 3000:80
-```
-- Default username/password: `admin/admin`
-- Configure PromQL queries like:
-  ```promql
-  sum(rate(cpu_usage[5m])) by (instance)
-  ```
-
-### **3️⃣ Set Up Alerting Rules**
-```yaml
-groups:
-- name: alerts
-  rules:
-  - alert: HighCPUUsage
-    expr: avg(rate(cpu_usage[5m])) > 75
-    for: 2m
-    labels:
-      severity: critical
-```
-```bash
-kubectl apply -f monitoring.yaml
 ```
 
 ---
