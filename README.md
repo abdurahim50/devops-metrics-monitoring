@@ -68,8 +68,12 @@ Ensure you have the following installed:
 
 ### **2️⃣ Clone the Repository**
 ```bash
-git clone https://github.com/your-username/devops-monitoring.git
-cd devops-monitoring
+git clone https://github.com/your-username/devops-metrics-monitoring.git
+cd devops-metrics-monitoring
+
+python3.10 -m venv venv
+source venv/bin/activate
+
 ```
 ### 3️⃣ Create .env File
 ```
@@ -115,6 +119,14 @@ cryptography==42.0.8  # Required for JWT
 psutil==5.9.8
 confluent-kafka==2.3.0
 ```
+## Running Locally
+Build the Docker image to ensure all dependencies are installed
+```
+docker-compose build --no--cache
+docker-compose up -d
+```
+
+
 
 
 ### **3️⃣ Set Up FastAPI Backend**
