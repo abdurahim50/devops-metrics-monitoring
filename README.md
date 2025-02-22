@@ -125,8 +125,55 @@ Build the Docker image to ensure all dependencies are installed
 docker-compose build --no--cache
 docker-compose up -d
 ```
+### verify containers
+```
+docker ps # Should show 4 running containers
+```
+### Test API Endpoints
+```
+# Get JWT token
+curl -X POST http://localhost:8000/token -d "username=admin&password=adminpass"
 
+# Access metrics (replace <TOKEN>)
+curl -H "Authorization: Bearer <TOKEN>" http://localhost:8000/metrics
+```
+### Kafka Integration
+```
+# Start producer
+docker-compose exec app python app/producer.py
 
+# Start consumer in another terminal
+docker-compose exec app python app/consumer.py
+```
+### Database Verification
+```
+docker-compose exec db psql -U postgres -d metrics_db -c "SELECT * FROM metrics;"
+```
+
+## 🚀 Phase 3: Production Deployment (AWS EKS)
+1. **Configure AWS CLI**
+```
+aws configure
+```
+
+2.  **Provision Infrastructure**
+```
+cd terraform
+terraform init
+terraform apply
+```
+
+3. **Deploy to Kubernetes** 
+```
+kubectl apply -f k8s/
+kubectl create secret generic app-secrets \
+  --from-literal=POSTGRES_PASSWORD=StrongPass123! \
+  --from-literal=SECRET_KEY=$(openssl rand -hex 32)
+```
+
+   
+## Monitoring Setup
+Install VictoriaMetrics & Grafana
 
 
 ### **3️⃣ Set Up FastAPI Backend**
