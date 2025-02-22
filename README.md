@@ -188,6 +188,12 @@ kubectl port-forward svc/grafana -n monitoring 3000:3000
 ```
 Visit http://localhost:3000 and configure VictoriaMetrics as a data source.
 
+- Default username/password: `admin/admin`
+- Configure PromQL queries like:
+  ```promql
+  sum(rate(cpu_usage[5m])) by (instance)
+  ```
+
 
 ## 🚀 CI/CD Pipeline (GitLab)
 
@@ -224,6 +230,7 @@ git add .
 git commit -m "Deploying new version"
 git push origin main
 ```
+
 
 ---
 
