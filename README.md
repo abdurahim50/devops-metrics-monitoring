@@ -172,60 +172,49 @@ kubectl create secret generic app-secrets \
 ```
 
    
-## Monitoring Setup
-Install VictoriaMetrics & Grafana
-
-
-### **3️⃣ Set Up FastAPI Backend**
-```bash
-cd devops-monitoring
-pip install -r requirements.txt
-python main.py
+## 📊 Monitoring & Alerting
+This project integrates **Grafana & VictoriaMetrics** for real-time monitoring
+### Install VictoriaMetrics & Grafana
 ```
+helm repo add victoria-metrics https://victoriametrics.github.io/helm-charts
+helm install victoria-metrics victoria-metrics/victoria-metrics-single -n monitoring
 
-### **4️⃣ Start PostgreSQL & Create Metrics Table**
-```bash
-sudo -u postgres psql -c "CREATE DATABASE metrics_db;"
-python database.py
+helm repo add grafana https://grafana.github.io/helm-charts
+helm install grafana grafana/grafana -n monitoring
 ```
-
-### **5️⃣ Run Kafka Producer & Consumer**
-```bash
-python producer.py & python consumer.py
+### Access Grafana dashboard
 ```
-
-### **6️⃣ Dockerize the Application**
-```bash
-docker build -t metrics_app .
-docker run -p 8000:8000 metrics_app
+kubectl port-forward svc/grafana -n monitoring 3000:3000
 ```
+Visit http://localhost:3000 and configure VictoriaMetrics as a data source.
 
-### **7️⃣ Deploy to Kubernetes**
-```bash
-kubectl apply -f kubernetes/deployment.yaml
-```
-
-### **8️⃣ Deploy to AWS using Terraform**
-```bash
-cd terraform
-terraform init
-terraform apply
-```
-
----
 
 ## 🚀 CI/CD Pipeline (GitLab)
 
 This project uses **GitLab CI/CD** for automated builds and deployments. The `.gitlab-ci.yml` file contains:
-```yaml
+```
+# .gitlab-ci.yml
 stages:
+  - test
   - build
   - deploy
 
-deploy:
+test:
+  stage: test
   script:
-    - docker build -t registry.gitlab.com/your-repo/metrics_app .
-    - docker push registry.gitlab.com/your-repo/metrics_app
+    - pip install -r requirements.txt
+    - pytest -v
+
+build:
+  stage: build
+  script:
+    - docker build -t registry.gitlab.com/your-repo/metrics-app .
+    - docker push registry.gitlab.com/your-repo/metrics-app
+
+deploy:
+  stage: deploy
+  script:
+    - aws eks update-kubeconfig --name metrics-cluster
     - kubectl apply -f kubernetes/deployment.yaml
 ```
 
