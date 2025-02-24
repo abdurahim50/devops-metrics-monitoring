@@ -1,47 +1,77 @@
-version: '3.8'
+#version: '3.8'  # Specify the Compose file format version
 
 services:
+  # PostgreSQL database service
   db:
-    image: postgres:15
+    image: postgres:15  # Use the official PostgreSQL 15 image
     volumes:
-     # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    - postgres_data:/var/lib/postgresql/data
-    env_file: .env
+      - postgres_data:/var/lib/postgresql/data  # Persist database files between container restarts
+    env_file: .env  # Load environment variables (like passwords) from a .env file
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U postgres"]  # Check if PostgreSQL is ready to accept connections
+      interval: 5s  # Run the health check every 5 seconds
+    networks:
+      - monitoring-network  # Connect this service to the custom network
 
+  # Zookeeper service, required for Kafka to function properly
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.3.0
+    image: confluentinc/cp-zookeeper:7.3.0  # Use Confluent's Zookeeper image
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_CLIENT_PORT: 2181  # Define the client port for Zookeeper connections
+      ZOOKEEPER_HEAP_OPTS: "-Xmx1G -Xms1G"  # Set the JVM heap size for Zookeeper
+      ZOOKEEPER_DATA_DIR: /var/lib/zookeeper/data  # Specify the data directory for Zookeeper
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data  # Persist Zookeeper data
+      - zookeeper_logs:/var/lib/zookeeper/log  # Persist Zookeeper logs
+      - /etc/localtime:/etc/localtime:ro  # Sync container time with host (read-only)
+      - /etc/timezone:/etc/timezone:ro      # Sync container timezone with host (read-only)
+    networks:
+      - monitoring-network  # Connect this service to the custom network
 
+  # Kafka service for message brokering
   kafka:
-    image: confluentinc/cp-kafka:7.3.0
+    image: confluentinc/cp-kafka:7.3.0  # Use Confluent's Kafka image
     environment:
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092  # Advertise the Kafka service on this address
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181  # Connect Kafka to the Zookeeper service
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1  # Set replication factor for internal topics
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1  # Replication factor for the transaction state log
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1  # Minimum in-sync replicas for transaction state log
     depends_on:
-      - zookeeper
+      - zookeeper  # Ensure Zookeeper starts before Kafka
+    volumes:
+      - kafka_data:/var/lib/kafka/data  # Persist Kafka data
+      - /etc/localtime:/etc/localtime:ro  # Sync container time with host (read-only)
+      - /etc/timezone:/etc/timezone:ro      # Sync container timezone with host (read-only)
+    networks:
+      - monitoring-network  # Connect this service to the custom network
 
+  # Application service that likely uses the db and kafka
   app:
     build:
-      context: .
-      dockerfile: docker/Dockerfile  # Corrected path to Dockerfile
-    env_file: .env
+      context: .  # Use the current directory as the build context
+      dockerfile: docker/Dockerfile  # Specify the Dockerfile location
+    env_file: .env  # Load environment variables from the .env file
     ports:
-      - "8000:8000"
+      - "8000:8000"  # Map port 8000 on the host to port 8000 in the container
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_healthy  # Wait for the database to pass its health check before starting the app
       kafka:
-        condition: service_started
+        condition: service_started  # Wait for Kafka to start before starting the app
     volumes:
-      - .:/app  # Mounts the project directory to the container
+      - .:/app  # Mount the current directory into /app in the container for live code updates
+      - /etc/localtime:/etc/localtime:ro  # Sync container time with host (read-only)
+      - /etc/timezone:/etc/timezone:ro      # Sync container timezone with host (read-only)
+    networks:
+      - monitoring-network  # Connect this service to the custom network
+
+volumes:
+  postgres_data:     # Named volume for persisting PostgreSQL data
+  zookeeper_data:    # Named volume for persisting Zookeeper data
+  zookeeper_logs:    # Named volume for persisting Zookeeper logs
+  kafka_data:        # Named volume for persisting Kafka data
 
 networks:
-  default:
-    name: monitoring-network
-  
-volumes:
-  postgres_data:  # ✅ Added volume definition
+  monitoring-network:
+    driver: bridge  # Use the bridge network driver for inter-container communication
